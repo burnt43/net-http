@@ -1716,7 +1716,7 @@ module Net   #:nodoc:
 
         # Still do the post_connection_check below even if connecting
         # to IP address
-        verify_hostname = @ssl_context.verify_hostname
+        verify_hostname = true #@ssl_context.verify_hostname
 
         # Server Name Indication (SNI) RFC 3546/6066
         case @address
@@ -1739,16 +1739,27 @@ module Net   #:nodoc:
            Process.clock_gettime(Process::CLOCK_REALTIME) < @ssl_session.time.to_f + @ssl_session.timeout
           s.session = @ssl_session
         end
-        ssl_socket_connect(s, @open_timeout)
+
+        s.connect
+        #ssl_socket_connect(s, @open_timeout)
+
         if (@ssl_context.verify_mode != OpenSSL::SSL::VERIFY_NONE) && verify_hostname
           s.post_connection_check(@address)
         end
         debug "SSL established, protocol: #{s.ssl_version}, cipher: #{s.cipher[0]}"
       end
-      @socket = BufferedIO.new(s, read_timeout: @read_timeout,
-                               write_timeout: @write_timeout,
-                               continue_timeout: @continue_timeout,
-                               debug_output: @debug_output)
+
+      @socket = BufferedIO.new(s).tap do |xxx|
+        xxx.read_timeout = @read_timeout
+        xxx.continue_timeout = @continue_timeout
+        xxx.debug_output = @debug_output
+      end
+
+      # @socket = BufferedIO.new(s, read_timeout: @read_timeout,
+      #                          write_timeout: @write_timeout,
+      #                          continue_timeout: @continue_timeout,
+      #                          debug_output: @debug_output)
+
       @last_communicated = nil
       on_connect
     rescue => exception

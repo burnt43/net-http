@@ -14,7 +14,7 @@ end
 
 Gem::Specification.new do |spec|
   spec.name          = name
-  spec.version       = '0.5.0.a'
+  spec.version       = '0.5.0.b'
   spec.authors       = ["NARUSE, Yui"]
   spec.email         = ["naruse@airemix.jp"]
 
