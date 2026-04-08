@@ -291,7 +291,7 @@ module Net::HTTPHeader
       val.each{|x| append_field_value(ary, x)}
     else
       val = val.to_s
-      if /[\r\n]/n.match?(val.b)
+      if /[\r\n]/n.match(val.b)
         raise ArgumentError, 'header field value cannot include CR/LF'
       end
       ary.push val
